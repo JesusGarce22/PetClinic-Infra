@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - "main.tf"  # Ejecuta solo cuando main.tf cambia
+      - "main.tf"
   pull_request:
     branches:
       - main
     paths:
-      - "main.tf"  # Ejecuta solo cuando main.tf cambia
+      - "main.tf" 
 
 env:
   ARM_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_ID }}
@@ -39,7 +39,6 @@ jobs:
       - name: Import Existing Resources
         shell: bash
         run: |
-          # Array de recursos a importar
           resources=(
             "azurerm_resource_group.rg /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
             "azurerm_container_registry.acr /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerRegistry/registries/divergencia"
@@ -47,7 +46,6 @@ jobs:
             "azurerm_kubernetes_cluster.aks_cluster /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerService/managedClusters/${{ env.AKS_CLUSTER_NAME }}"
           )
 
-          # Itera sobre cada recurso y lo importa si no está en el estado
           for resource in "${resources[@]}"; do
             terraform import $resource || echo "Resource already managed"
           done
@@ -60,32 +58,3 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-
-  deployToAKS:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Azure CLI
-        uses: azure/setup-azurecli@v1
-        with:
-          azcliversion: 2.33.0
-
-      - name: Login to Azure
-        run: |
-          az login --service-principal -u ${{ env.ARM_CLIENT_ID }} -p ${{ env.ARM_CLIENT_SECRET }} --tenant ${{ env.ARM_TENANT_ID }}
-
-      - name: Set Azure subscription
-        run: az account set --subscription ${{ env.ARM_SUBSCRIPTION_ID }}
-
-      - name: Get AKS credentials
-        run: az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }}
-
-      - name: Install kubectl
-        run: sudo apt-get install -y kubectl
-
-      - name: Apply Kubernetes manifests
-        run: |
-          kubectl apply -f ./aks-files
