@@ -34,9 +34,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan \
-          -var "tenant_id=${{ secrets.TENANT_ID }}" \
-          -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
+        run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
       
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
