@@ -7,18 +7,6 @@ on:
     paths:
       - "aks-files/**"
 
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  ARM_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.SERVICE_PRINCIPAL_KEY }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION }}
-  ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
-  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-  AKS_CLUSTER_NAME: ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
-
 jobs:
   deployToAKS:
     runs-on: ubuntu-latest
@@ -27,22 +15,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ env.ARM_CLIENT_ID }}
-          client-secret: ${{ env.ARM_CLIENT_SECRET }}
-          tenant-id: ${{ env.ARM_TENANT_ID }}
-          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+      - name: Set Azure Variables
+        run: |
+          echo "AZURE_CLIENT_ID=${{ secrets.SERVICE_PRINCIPAL_ID }}" >> $GITHUB_ENV
+          echo "AZURE_CLIENT_SECRET=${{ secrets.SERVICE_PRINCIPAL_KEY }}" >> $GITHUB_ENV
+          echo "AZURE_TENANT_ID=${{ secrets.TENANT_ID }}" >> $GITHUB_ENV
+          echo "AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION }}" >> $GITHUB_ENV
+          echo "RESOURCE_GROUP=${{ secrets.AZURE_RESOURCE_GROUP }}" >> $GITHUB_ENV
+          echo "AKS_CLUSTER_NAME=${{ secrets.AZURE_AKS_CLUSTER_NAME }}" >> $GITHUB_ENV
+        shell: bash
+        display-name: 'Set Azure Environment Variables'
 
-      - name: Set Azure subscription
-        run: az account set --subscription ${{ env.ARM_SUBSCRIPTION_ID }}
+      - name: Login to Azure CLI
+        run: |
+          az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+          az account set --subscription $AZURE_SUBSCRIPTION_ID
+        shell: bash
+        display-name: 'Login to Azure CLI and Set Subscription'
 
-      - name: Get AKS credentials
-        run: az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }}
+      - name: Get AKS Credentials
+        run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER_NAME
+        display-name: 'Get AKS Credentials'
 
       - name: Install kubectl
         run: sudo apt-get install -y kubectl
+        display-name: 'Install kubectl'
 
-      - name: Apply Kubernetes manifests
+      - name: Apply Kubernetes Manifests
         run: kubectl apply -f ./aks-files
+        display-name: 'Apply Kubernetes Manifests'
