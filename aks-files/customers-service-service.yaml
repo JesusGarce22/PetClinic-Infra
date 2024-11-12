@@ -14,3 +14,5 @@ spec:
       targetPort: 8081
   selector:
     io.kompose.service: customers-service
+
+
