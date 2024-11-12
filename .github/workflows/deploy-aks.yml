@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "aks-files/**" 
+      - "aks-files/**"
 
 env:
   ARM_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_ID }}
@@ -26,10 +26,10 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.SERVICE_PRINCIPAL_ID }}
-          tenant-id: ${{ secrets.TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION }}
-          creds: ${{ secrets.SERVICE_PRINCIPAL_KEY }}
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          client-secret: ${{ env.ARM_CLIENT_SECRET }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
 
       - name: Set Azure subscription
         run: az account set --subscription ${{ env.ARM_SUBSCRIPTION_ID }}
