@@ -23,14 +23,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Azure CLI
-        uses: Azure/login@v1
-        with:
-          azcliversion: 2.33.0
-
       - name: Login to Azure
-        run: |
-          az login --service-principal -u ${{ env.ARM_CLIENT_ID }} -p ${{ env.ARM_CLIENT_SECRET }} --tenant ${{ env.ARM_TENANT_ID }}
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.SERVICE_PRINCIPAL_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION }}
+          creds: ${{ secrets.SERVICE_PRINCIPAL_KEY }}
 
       - name: Set Azure subscription
         run: az account set --subscription ${{ env.ARM_SUBSCRIPTION_ID }}
@@ -42,5 +41,4 @@ jobs:
         run: sudo apt-get install -y kubectl
 
       - name: Apply Kubernetes manifests
-        run: |
-          kubectl apply -f ./aks-files
+        run: kubectl apply -f ./aks-files
