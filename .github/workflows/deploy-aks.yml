@@ -1,0 +1,46 @@
+name: Deploy to AKS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "aks-files/**"  # Ejecuta solo si hay cambios en aks-files
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.SERVICE_PRINCIPAL_KEY }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION }}
+  ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  AKS_CLUSTER_NAME: ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
+
+jobs:
+  deployToAKS:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Azure CLI
+        uses: azure/setup-azurecli@v1
+        with:
+          azcliversion: 2.33.0
+
+      - name: Login to Azure
+        run: |
+          az login --service-principal -u ${{ env.ARM_CLIENT_ID }} -p ${{ env.ARM_CLIENT_SECRET }} --tenant ${{ env.ARM_TENANT_ID }}
+
+      - name: Set Azure subscription
+        run: az account set --subscription ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Get AKS credentials
+        run: az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }}
+
+      - name: Install kubectl
+        run: sudo apt-get install -y kubectl
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f ./aks-files
