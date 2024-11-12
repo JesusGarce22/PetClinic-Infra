@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "main.tf"  # Ejecuta solo cuando main.tf cambia
   pull_request:
     branches:
       - main
+    paths:
+      - "main.tf"  # Ejecuta solo cuando main.tf cambia
 
 env:
   ARM_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_ID }}
@@ -32,35 +36,34 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      # Importar recursos existentes para evitar recreación
-      - name: Import existing Resource Group
-        run: terraform import azurerm_resource_group.rg "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
-        continue-on-error: true  # Para evitar error si el recurso ya está en el estado
+      - name: Import Existing Resources
+        shell: bash
+        run: |
+          # Array de recursos a importar
+          resources=(
+            "azurerm_resource_group.rg /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
+            "azurerm_container_registry.acr /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerRegistry/registries/divergencia"
+            "azurerm_key_vault.key_vault /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.KeyVault/vaults/divergenciakeyvault"
+            "azurerm_kubernetes_cluster.aks_cluster /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerService/managedClusters/${{ env.AKS_CLUSTER_NAME }}"
+          )
 
-      - name: Import existing AKS Cluster
-        run: terraform import azurerm_kubernetes_cluster.aks_cluster "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerService/managedClusters/${{ secrets.AZURE_AKS_CLUSTER_NAME }}"
-        continue-on-error: true
-
-      - name: Import existing Azure Key Vault
-        run: terraform import azurerm_key_vault.key_vault "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.KeyVault/vaults/<key_vault_name>"
-        continue-on-error: true
-
-      - name: Import existing Container Registry
-        run: terraform import azurerm_container_registry.acr "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerRegistry/registries/<acr_name>"
-        continue-on-error: true
+          # Itera sobre cada recurso y lo importa si no está en el estado
+          for resource in "${resources[@]}"; do
+            terraform import $resource || echo "Resource already managed"
+          done
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
-      
+
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
 
   deployToAKS:
     runs-on: ubuntu-latest
-    needs: terraformDeploy  # Solo se ejecuta si terraformDeploy es exitoso
+    needs: terraformDeploy
 
     steps:
       - name: Checkout code
@@ -73,10 +76,10 @@ jobs:
 
       - name: Login to Azure
         run: |
-          az login --service-principal -u ${{ env.AZURE_CLIENT_ID }} -p ${{ env.AZURE_CLIENT_SECRET }} --tenant ${{ env.AZURE_TENANT_ID }}
+          az login --service-principal -u ${{ env.ARM_CLIENT_ID }} -p ${{ env.ARM_CLIENT_SECRET }} --tenant ${{ env.ARM_TENANT_ID }}
 
       - name: Set Azure subscription
-        run: az account set --subscription ${{ env.AZURE_SUBSCRIPTION_ID }}
+        run: az account set --subscription ${{ env.ARM_SUBSCRIPTION_ID }}
 
       - name: Get AKS credentials
         run: az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER_NAME }}
