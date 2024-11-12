@@ -35,6 +35,10 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Import existing Resource Group
+        run: terraform import azurerm_resource_group.rg "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
+        continue-on-error: true
+
       - name: Terraform Plan
         run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
       
