@@ -2,13 +2,11 @@
 variable "tenant_id" {
   type        = string
   description = "Azure tenant id"
-  default = ${{ secrets.TENANT_ID }}
 }
 
 variable "subscription_id" {
   type        = string
   description = "Azure subscription id"
-  default     = ${{ secrets.AZURE_SUBSCRIPTION }}
 }
 
 variable "resource_group_name" {
