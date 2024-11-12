@@ -24,23 +24,18 @@ jobs:
           echo "RESOURCE_GROUP=${{ secrets.AZURE_RESOURCE_GROUP }}" >> $GITHUB_ENV
           echo "AKS_CLUSTER_NAME=${{ secrets.AZURE_AKS_CLUSTER_NAME }}" >> $GITHUB_ENV
         shell: bash
-        display-name: 'Set Azure Environment Variables'
 
       - name: Login to Azure CLI
         run: |
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
           az account set --subscription $AZURE_SUBSCRIPTION_ID
         shell: bash
-        display-name: 'Login to Azure CLI and Set Subscription'
 
       - name: Get AKS Credentials
         run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER_NAME
-        display-name: 'Get AKS Credentials'
 
       - name: Install kubectl
         run: sudo apt-get install -y kubectl
-        display-name: 'Install kubectl'
 
       - name: Apply Kubernetes Manifests
         run: kubectl apply -f ./aks-files
-        display-name: 'Apply Kubernetes Manifests'
