@@ -34,7 +34,7 @@ jobs:
           client-secret: ${{ env.ARM_CLIENT_SECRET }}
           tenant-id: ${{ env.ARM_TENANT_ID }}
           subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
-          auth-type: client-credentials
+          auth-type: SERVICE_PRINCIPAL
 
       - name: Set Azure subscription
         run: az account set --subscription ${{ env.ARM_SUBSCRIPTION_ID }}
