@@ -37,5 +37,8 @@ jobs:
       - name: Install kubectl
         run: sudo apt-get install -y kubectl
 
+      - name: Delete existing Deployments
+        run: kubectl delete deployments --all
+
       - name: Apply Kubernetes Manifests
         run: kubectl apply -f ./aks-files
