@@ -32,9 +32,22 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      # Importar recursos existentes para evitar recreación
       - name: Import existing Resource Group
         run: terraform import azurerm_resource_group.rg "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
-        continue-on-error: true  # Para que no falle si el recurso ya está importado
+        continue-on-error: true  # Para evitar error si el recurso ya está en el estado
+
+      - name: Import existing AKS Cluster
+        run: terraform import azurerm_kubernetes_cluster.aks_cluster "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerService/managedClusters/${{ secrets.AZURE_AKS_CLUSTER_NAME }}"
+        continue-on-error: true
+
+      - name: Import existing Azure Key Vault
+        run: terraform import azurerm_key_vault.key_vault "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.KeyVault/vaults/<key_vault_name>"
+        continue-on-error: true
+
+      - name: Import existing Container Registry
+        run: terraform import azurerm_container_registry.acr "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerRegistry/registries/<acr_name>"
+        continue-on-error: true
 
       - name: Terraform Validate
         run: terraform validate
