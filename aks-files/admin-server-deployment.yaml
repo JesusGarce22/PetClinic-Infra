@@ -5,6 +5,7 @@
     labels:
       app: admin-server
   spec:
+    type: LoadBalancer
     replicas: 1
     selector:
       matchLabels:

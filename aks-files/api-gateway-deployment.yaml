@@ -5,6 +5,7 @@ metadata:
   labels:
     app: api-gateway
 spec:
+  type: LoadBalancer
   replicas: 1
   selector:
     matchLabels:
