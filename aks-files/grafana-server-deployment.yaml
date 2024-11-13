@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: grafana-server
-          image: petdistriacr.azurecr.io/grafana:latest
+          image: divergencia.azurecr.io/grafana:latest
           ports:
             - containerPort: 3000
           resources:

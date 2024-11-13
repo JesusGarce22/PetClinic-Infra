@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: tracing-server
-          image: petdistriacr.azurecr.io/zipkin:latest
+          image: divergencia.azurecr.io/zipkin:latest
           env:
             - name: JAVA_OPTS
               value: -XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom

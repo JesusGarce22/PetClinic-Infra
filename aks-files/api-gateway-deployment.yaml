@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: petdistriacr.azurecr.io/spring-petclinic-api-gateway:latest
+          image: divergencia.azurecr.io/spring-petclinic-api-gateway:latest
           ports:
             - containerPort: 8080
           resources:

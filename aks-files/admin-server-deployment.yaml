@@ -16,7 +16,7 @@
       spec:
         containers:
           - name: admin-server
-            image: petdistriacr.azurecr.io/spring-petclinic-admin-server:latest
+            image: divergencia.azurecr.io/spring-petclinic-admin-server:latest
             ports:
               - containerPort: 9090
             resources:

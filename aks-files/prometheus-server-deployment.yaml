@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: prometheus-server
-          image: petdistriacr.azurecr.io/prometheus:latest
+          image: divergencia.azurecr.io/prometheus:latest
           ports:
             - containerPort: 9090
           resources:

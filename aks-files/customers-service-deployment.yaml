@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: customers-service
-          image: petdistriacr.azurecr.io/spring-petclinic-customers-service:latest
+          image: divergencia.azurecr.io/spring-petclinic-customers-service:latest
           ports:
             - containerPort: 8081
           resources:

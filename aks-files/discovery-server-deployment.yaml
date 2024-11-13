@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: discovery-server
-          image: petdistriacr.azurecr.io/spring-petclinic-discovery-server:latest
+          image: divergencia.azurecr.io/spring-petclinic-discovery-server:latest
           ports:
             - containerPort: 8761
           resources:

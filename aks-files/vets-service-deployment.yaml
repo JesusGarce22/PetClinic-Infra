@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: vets-service
-          image: petdistriacr.azurecr.io/spring-petclinic-vets-service:latest
+          image: divergencia.azurecr.io/spring-petclinic-vets-service:latest
           ports:
             - containerPort: 8083
           resources:
