@@ -39,7 +39,7 @@ module "keyvault" {
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
   tenant_id           = var.tenant_id
-  object_id           = azurerm_kubernetes_cluster.aks_cluster.identity[0].principal_id
+  object_id           = "7c8ab49a-20e5-46a5-a434-3ad3ec71335c"
 }
 
 # AKS and ACR role assignment
