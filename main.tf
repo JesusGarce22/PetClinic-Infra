@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
 }
 
-# AKS module
+# AKS modules
 module "aks" {
   source              = "./modules/aks"
   aks_cluster_name    = var.aks_cluster_name
