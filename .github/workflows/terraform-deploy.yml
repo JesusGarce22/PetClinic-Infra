@@ -33,9 +33,6 @@ jobs:
         with:
           terraform_wrapper: false
 
-      - name: Terraform Destroy
-        run: terraform destroy
-
       - name: Terraform Init
         run: terraform init
 
