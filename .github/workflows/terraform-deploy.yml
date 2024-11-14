@@ -6,11 +6,7 @@ on:
       - main
     paths:
       - "main.tf"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "main.tf"
+      - "backend.tf"
       - "modules/**"
 
 env:
@@ -18,14 +14,9 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.SERVICE_PRINCIPAL_KEY }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION }}
   ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
-  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-  AKS_CLUSTER_NAME: ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
-  STORAGE_ACCOUNT_NAME: ${{ secrets.STORAGE_ACCOUNT_NAME }}
-  STORAGE_CONTAINER_NAME: ${{ secrets.STORAGE_CONTAINER_NAME }}
-  TFSTATE_KEY: "terraform.tfstate"
 
 jobs:
-  terraformDeploy:
+  create-backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,33 +25,26 @@ jobs:
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_wrapper: false
 
-      - name: Terraform Init
-        run: |
-          terraform init \
-            -backend-config="resource_group_name=${{ env.RESOURCE_GROUP }}" \
-            -backend-config="storage_account_name=${{ env.STORAGE_ACCOUNT_NAME }}" \
-            -backend-config="container_name=${{ env.STORAGE_CONTAINER_NAME }}" \
-            -backend-config="key=${{ env.TFSTATE_KEY }}"
+      - name: Terraform Init (Backend Creation)
+        run: terraform init -backend=false -chdir=./backend.tf
 
-      - name: Import Existing Resources
-        shell: bash
-        run: |
-          resources=(
-            "azurerm_resource_group.rg /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
-            "azurerm_container_registry.acr /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerRegistry/registries/${{ secrets.ACR_NAME }}"
-            "azurerm_key_vault.key_vault /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.KeyVault/vaults/${{ secrets.KEY_VAULT_NAME }}"
-            "azurerm_kubernetes_cluster.aks_cluster /subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerService/managedClusters/${{ env.AKS_CLUSTER_NAME }}"
-          )
+      - name: Terraform Apply (Backend Creation)
+        run: terraform apply -auto-approve -chdir=./backend.tf
 
-          for resource in "${resources[@]}"; do
-            terraform import $resource || echo "Resource already managed"
-          done
+  main-deployment:
+    runs-on: ubuntu-latest
+    needs: create-backend
 
-      - name: Terraform Validate
-        run: terraform validate
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init with Remote Backend
+        run: terraform init
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}" 
