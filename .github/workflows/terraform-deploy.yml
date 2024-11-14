@@ -10,7 +10,8 @@ on:
     branches:
       - main
     paths:
-      - "main.tf" 
+      - "main.tf"
+      - "modules/**"
 
 env:
   ARM_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_ID }}
