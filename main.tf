@@ -42,12 +42,11 @@ module "keyvault" {
   object_id           = "7c8ab49a-20e5-46a5-a434-3ad3ec71335c"
 }
 
-# AKS and ACR role assignment
+# Role Assignment AKS y ACR
 resource "azurerm_role_assignment" "aks_acr_role_assignment" {
-  principal_id         = azurerm_kubernetes_cluster.aks_cluster.kubelet_identity[0].object_id
+  principal_id         = module.aks.kubelet_identity_object_id
   role_definition_name = "AcrPull"
-  scope                = azurerm_container_registry.acr.id
+  scope                = module.acr.acr_id
 
-  depends_on = [azurerm_kubernetes_cluster.aks_cluster]
+  depends_on = [module.aks]
 }
-
