@@ -5,6 +5,8 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
+provider "azuread" {}
+
 # Crear el grupo de recursos
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
@@ -27,7 +29,7 @@ resource "azurerm_storage_container" "tfstate" {
   container_access_type = "private"
 }
 
-# Módulo AKS
+# AKS modules
 module "aks" {
   source              = "./modules/aks"
   aks_cluster_name    = var.aks_cluster_name
@@ -38,7 +40,7 @@ module "aks" {
   vm_size             = var.vm_size
 }
 
-# Módulo ACR
+# ACR module
 module "acr" {
   source              = "./modules/acr"
   acr_name            = var.acr_name
@@ -46,7 +48,7 @@ module "acr" {
   resource_group_name = azurerm_resource_group.rg.name
 }
 
-# Módulo Key Vault
+# Key Vault module
 module "keyvault" {
   source              = "./modules/keyvault"
   key_vault_name      = var.key_vault_name
@@ -56,7 +58,7 @@ module "keyvault" {
   object_id           = "7c8ab49a-20e5-46a5-a434-3ad3ec71335c"
 }
 
-# Asignación de roles para AKS y ACR
+# Role Assignment AKS y ACR
 resource "azurerm_role_assignment" "aks_acr_role_assignment" {
   principal_id         = module.aks.kubelet_identity_object_id
   role_definition_name = "AcrPull"
