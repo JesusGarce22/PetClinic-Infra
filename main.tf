@@ -1,10 +1,10 @@
 #tf remote backend
 terraform {
   backend "azurerm" {
-    resource_group_name   = "az_rg"
-    storage_account_name  = "divergenciaSA"
-    container_name        = "terraform-state"
-    key                   = "terraform.tfstate"
+    resource_group_name  = "az_rg"
+    storage_account_name = "divergenciaSA"
+    container_name       = "terraform-state"
+    key                  = "terraform.tfstate"
   }
 }
 
