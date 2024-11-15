@@ -11,6 +11,7 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
 }
 
+"storage account
 resource "azurerm_storage_account" "tfstate" {
   name                     = "divergenciaSA"
   resource_group_name      = azurerm_resource_group.rg.name
