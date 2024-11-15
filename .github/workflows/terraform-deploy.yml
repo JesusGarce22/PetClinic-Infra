@@ -26,10 +26,10 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Terraform Init (Backend Creation)
-        run: terraform init -backend=true
+      - name: Terraform Init for Backend (Creation of Storage Account, etc.)
+        run: terraform init -backend=false 
 
-      - name: Terraform Apply (Backend Creation)
+      - name: Terraform Apply for Backend
         run: terraform apply -auto-approve -input=false
 
   main-deployment:
@@ -44,10 +44,10 @@ jobs:
         uses: hashicorp/setup-terraform@v2
       
       - name: Terraform Init with Remote Backend
-        run: terraform init -backend=true 
+        run: terraform init -backend=true
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}" 
+        run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false tfplan
