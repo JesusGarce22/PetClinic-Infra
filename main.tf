@@ -7,7 +7,6 @@ provider "azurerm" {
 
 provider "azuread" {}
 
-# Crear el grupo de recursos
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location

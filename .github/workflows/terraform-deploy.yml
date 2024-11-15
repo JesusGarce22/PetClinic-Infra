@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - "main.tf"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "main.tf"
       - "modules/**"
 
 env:
@@ -15,7 +20,7 @@ env:
   ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
 
 jobs:
-  terraform-deployment:
+  terraformDeploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,15 +29,17 @@ jobs:
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
 
-      - name: Terraform Init (Backend Creation and Remote State)
+      - name: Terraform Init
         run: terraform init
 
-      - name: Terraform validate
+      - name: Terraform Validate
         run: terraform validate
 
-      - name: Terraform Plan (Backend & Main Resources)
-        run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"  # Planifica todos los recursos
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
 
-      - name: Terraform Apply (Create or Update Resources)
-        run: terraform apply -auto-approve -input=false tfplan
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
