@@ -24,7 +24,7 @@ resource "azurerm_storage_account" "tfstate" {
 # Crear el contenedor de almacenamiento para el estado remoto
 resource "azurerm_storage_container" "tfstate" {
   name                  = "terraform-state"
-  storage_account_name  = azurerm_storage_account.tfstate.name
+  storage_account_id    = azurerm_storage_account.tfstate.id
   container_access_type = "private"
 }
 

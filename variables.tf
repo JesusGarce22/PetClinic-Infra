@@ -36,7 +36,7 @@ variable "dns_prefix" {
 variable "node_count" {
   type        = number
   description = "Number of nodes in the cluster"
-  default     = 2
+  default     = 1
 }
 
 variable "vm_size" {
