@@ -42,9 +42,9 @@ jobs:
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
-      
+
       - name: Terraform Init with Remote Backend (Reconfigure)
-        run: terraform init -backend=true -reconfigure  # Configura el backend remoto
+        run: terraform init -backend=true -reconfigure -force-copy  # Reconfigura el backend remoto y fuerza la copia del estado
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
