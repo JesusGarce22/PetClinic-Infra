@@ -186,3 +186,24 @@ Antes de aplicar los nuevos manifiestos, se eliminan todas las implementaciones 
 
 #### 3.7 **Aplicación de los Manifiestos de Kubernetes**
 Finalmente, se aplican los manifiestos de Kubernetes que se encuentran en el directorio `./aks-files/` mediante el comando `kubectl apply -f ./aks-files`. Este paso crea o actualiza los recursos de Kubernetes (como `Deployments`, `Services`) en el clúster de AKS.
+
+# Configuración del Backend Remoto en Terraform
+
+Esta seccion describe los pasos generales para configurar un backend remoto en Terraform utilizando Azure Storage. Esta configuración centraliza el almacenamiento del archivo de estado de Terraform (`terraform.tfstate`), lo que facilita la colaboración y garantiza la consistencia en la gestión de la infraestructura.
+
+## Proceso General
+
+1. **Creación de Recursos en Azure**: 
+   Se utilizó Azure como backend para almacenar el archivo de estado. Para ello, se crearon:
+   - Un grupo de recursos que aloja todos los recursos necesarios para el backend.
+   - Una cuenta de almacenamiento de Azure, que es donde se almacena el archivo de estado.
+   - Un contenedor dentro de la cuenta de almacenamiento, que organiza y almacena el archivo de estado.
+
+2. **Configuración del Backend en Terraform**:
+   Una vez creados los recursos, configuramos el backend en Terraform para que el archivo de estado se almacene en el contenedor de almacenamiento. Esto permite que el archivo de estado se comparta y mantenga actualizado de forma centralizada, eliminando conflictos entre los miembros del equipo.
+
+3. **Ejecución de Comandos de Inicialización y Aplicación**:
+   Para activar la configuración, ejecutamos `terraform init` y `terraform apply`, asegurándonos de que Terraform use el backend remoto para almacenar el estado.
+
+4. **Solución de Problemas Comunes**:
+   Durante la configuración, se encontraron advertencias relacionadas con versiones de proveedores y permisos de registro automático. Solucionamos esto utilizando una opción en el proveedor de Azure para omitir el registro automático de recursos, lo cual evitó problemas de permisos.

@@ -1,4 +1,3 @@
-# variables.tf
 variable "tenant_id" {
   type        = string
   description = "Azure tenant id"
@@ -10,15 +9,40 @@ variable "subscription_id" {
 }
 
 variable "resource_group_name" {
-  type        = string
-  description = "Name of the resource group"
-  default     = "az_rg"
+  type    = string
+  default = "az_rg"
 }
 
 variable "location" {
-  type        = string
-  description = "Location of the resources"
-  default     = "East US"
+  type    = string
+  default = "eastus"
+}
+
+
+variable "storage_account_name" {
+  type    = string
+  default = "divergencia"
+}
+
+variable "storage_account_tier" {
+  type    = string
+  default = "Standard"
+}
+
+variable "storage_account_replication_type" {
+  type    = string
+  default = "LRS"
+}
+
+
+variable "storage_container_name" {
+  type    = string
+  default = "terraform-state"
+}
+
+variable "container_access_type" {
+  type    = string
+  default = "blob"
 }
 
 variable "aks_cluster_name" {

@@ -32,14 +32,15 @@ jobs:
         with:
           terraform_wrapper: false
 
+      # Inicializar Terraform con el backend remoto configurado
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="path=backend.tf"
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
+        run: terraform plan -out=tfplan -var-file="stage/stage.tfvars" -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply var-file="stage/stage.tfvars" -auto-approve tfplan
