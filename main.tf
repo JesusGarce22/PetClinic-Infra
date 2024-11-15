@@ -8,7 +8,7 @@ terraform {
   }
 }
 
-# AKS module
+# AKS modules
 module "aks" {
   source              = "./modules/aks"
   aks_cluster_name    = var.aks_cluster_name
