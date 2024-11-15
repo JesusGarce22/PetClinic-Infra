@@ -27,18 +27,17 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init (Backend Creation)
-        run: terraform init -backend=false  # Inicializa Terraform sin configurar el backend remoto
+        run: terraform init
 
       - name: Terraform Plan for Backend
         run: terraform plan -out=tfplan_backend -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
 
       - name: Terraform Apply for Backend (Create Resources)
-        run: terraform apply -auto-approve -input=false tfplan_backend  # Aplica el backend (grupo de recursos, almacenamiento, etc.)
+        run: terraform apply -auto-approve -input=false tfplan_backend
 
   main-deployment:
     runs-on: ubuntu-latest
-    needs: create-backend  # Asegura que 'create-backend' se ejecute primero
-
+    needs: create-backend
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -47,10 +46,10 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init with Remote Backend (Reconfigure)
-        run: terraform init -backend=true -reconfigure  # Configura el backend remoto después de crear los recursos
+        run: terraform init -backend=true -reconfigure
 
       - name: Terraform Plan (Main Resources)
         run: terraform plan -out=tfplan_main -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"
 
       - name: Terraform Apply for Main Resources
-        run: terraform apply -auto-approve -input=false tfplan_main  # Aplica los recursos principales definidos en main.tf
+        run: terraform apply -auto-approve -input=false tfplan_main
