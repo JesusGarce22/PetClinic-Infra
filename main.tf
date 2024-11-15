@@ -4,6 +4,7 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
+#tf remote backend
 terraform {
   backend "azurerm" {
     resource_group_name   = var.resource_group_name
