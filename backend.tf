@@ -5,7 +5,6 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
-# Grupo de recursos y cuenta de almacenamiento para el backend remoto
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
