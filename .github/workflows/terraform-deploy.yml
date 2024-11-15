@@ -26,7 +26,10 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init (Backend Creation and Remote State)
-        run: terraform init -backend=true -reconfigure  # Configura el backend remoto y actualiza el estado
+        run: terraform init
+
+      - name: Terraform validate
+        run: terraform validate
 
       - name: Terraform Plan (Backend & Main Resources)
         run: terraform plan -out=tfplan -var "tenant_id=${{ secrets.TENANT_ID }}" -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION }}"  # Planifica todos los recursos
